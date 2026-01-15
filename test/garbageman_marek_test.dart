@@ -1,0 +1,8 @@
+import 'package:garbageman_marek/garbageman_marek.dart';
+import 'package:test/test.dart';
+
+void main() {
+  test('calculate', () {
+    expect(calculate(), 42);
+  });
+}
