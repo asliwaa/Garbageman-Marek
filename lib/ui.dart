@@ -30,6 +30,10 @@ class Ui {
     stdout.write('Sell garbage (amount): ');
   }
 
+  void notEnoughGarbage(int sellGarbageAmount, int garbageCart) {
+    print('You wanted to sell $sellGarbageAmount pieces of garbage, but have only $garbageCart in your cart.');
+  }
+
   void chooseBuyOrSell() {
     stdout.write('Choose action [ (B)uy | (S)ell ]:');
   }
