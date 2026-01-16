@@ -12,7 +12,7 @@ class Vendor {
     this.garbageUnitPrice = garbageUnitPrice;
   }
 
-  double drawGarbageUnitPrice () {
+  double generateGarbageUnitPrice () {
     var randomPrice = Random().nextDouble() * (2.5 - 1.5) + 1.5;
     return double.parse(randomPrice.toStringAsFixed(1));
   }
