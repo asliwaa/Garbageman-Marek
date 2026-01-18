@@ -1,11 +1,18 @@
-import 'package:garbageman_marek/vendor.dart' as vendor;
-import 'package:garbageman_marek/marek.dart' as marek;
-
 import 'dart:io';
 
 class Ui {
+
+  String _message = ''; 
+
+  void showMessage() {
+    if (_message.isNotEmpty) {
+      print('\n*** $_message ***\n');
+      _message = '';
+    }
+  }
+
   void logo() {
-    print('   GARBAGE MAN - MAREK\n\n');
+    print('   GARBAGE MAN - MAREK');
   }
 
   void walletAndGarbageCart(var wallet, var garbageCart) {
@@ -13,29 +20,47 @@ class Ui {
   }
 
   void mustBuy() {
-    print('No garbage to sell. You must buy some.');
-    stdout.write('Buy garbage (amount): ');
+    _message = 'No garbage to sell. You must buy some.';
   }
-
+  
   void notEnoughMoney(double totalPrice, double wallet) {
-    print('Total price was $totalPrice\$, you only have $wallet\$.');
+    _message = 'Total price was $totalPrice\$, you only have $wallet\$.';
   }
 
-  void  boughtGarbage(int buyGarbageAmount, double unitPrice) {
-    print('You bought $buyGarbageAmount garbage pieces for $unitPrice\$ each.');
+  void boughtGarbage(int buyGarbageAmount, double unitPrice) {
+    _message = 'You bought $buyGarbageAmount garbage pieces for $unitPrice\$ each.';
   }
 
   void mustSell() {
-    print('Not enought money in wallet to buy anything. You must sell something.');
-    stdout.write('Sell garbage (amount): ');
+    _message = 'Not enough money in wallet to buy anything. You must sell something.';
   }
 
   void notEnoughGarbage(int sellGarbageAmount, int garbageCart) {
-    print('You wanted to sell $sellGarbageAmount pieces of garbage, but have only $garbageCart in your cart.');
+    _message = 'You wanted to sell $sellGarbageAmount pieces of garbage, but have only $garbageCart in your cart.';
+  }
+
+  void soldGarbage(int sellGarbageAmount, double profit) {
+    _message = 'You sold $sellGarbageAmount pieces of garbage and earned $profit';
+  }
+
+  void invalidGarbageAmount() {
+    _message = 'Invalid garbage amount.';
+  }
+
+  void chooseBuyAmount() {
+    stdout.write('Buy garbage (amount): ');
+  }
+
+  void chooseSellAmount() {
+    stdout.write('Sell garbage (amount): ');
   }
 
   void chooseBuyOrSell() {
-    stdout.write('Choose action [ (B)uy | (S)ell ]:');
+    stdout.write('Choose action [ (B)uy | (S)ell ]: ');
+  }
+
+  void clearScreen() {
+    print('\x1B[2J\x1B[0;0H');
   }
 
 }

@@ -15,50 +15,108 @@ class Game {
     var draw = ui.Ui();
     var shop = vendor.Vendor();
 
-    draw.logo();
-    draw.walletAndGarbageCart(player.getWallet, player.getGarbageCart);
+    bool gameOn = true;
 
-    var playersGarbage = player.getGarbageCart;
-    var playersWallet = player.getWallet;
+    while (gameOn) {
 
-    if (playersGarbage == 0) {
-      draw.mustBuy();
-      int? buyGarbageAmount = int.parse(stdin.readLineSync()!);
+      draw.clearScreen();
 
-      double unitPrice = shop.generateGarbageUnitPrice();
-      shop.setGarbageUnitPrice = unitPrice;
+      draw.logo();
+      draw.walletAndGarbageCart(player.getWallet, player.getGarbageCart);
 
-      double totalPrice = (buyGarbageAmount * unitPrice) + transactionFee;
+      draw.showMessage();
 
-      if (totalPrice > player.getWallet) {
-        draw.notEnoughMoney(totalPrice, player.getWallet);
-        player.setWallet = player.getWallet - transactionFee;
-      } else if (totalPrice <= player.getWallet){
-        draw.boughtGarbage(buyGarbageAmount, unitPrice);
-        player.setWallet = player.getWallet - totalPrice;
+      int playersGarbage = player.getGarbageCart;
+      double playersWallet = player.getWallet;
+
+      if (playersWallet >= 50.0) {
+
+        print ('YOU WON');
+        gameOn = false;
+        
+      } else if (playersWallet == 1.4 && playersGarbage == 0){
+        
+        print('YOU LOST');
+        gameOn = false;
+
+      } else if (playersGarbage == 0) {
+
+        draw.mustBuy();
+        buyGarbage(player, shop, draw);
+
+      } else if (playersGarbage > 0 && playersWallet <= 1.4) {
+
+        draw.mustSell();
+        sellGarbage(player, draw);
+
+      }else if (playersGarbage >= 1 && playersWallet >= 1.5) {
+
+        draw.chooseBuyOrSell();
+        String? action = stdin.readLineSync();
+
+        if (action == 'B') {
+          buyGarbage(player, shop, draw);
+        } else if (action == 'S') {
+          sellGarbage(player, draw);
+        } else {
+          break;
+        }
+
       }
-
-    } else if (playersGarbage >0 && playersWallet <= 1.4) {
-      draw.mustSell();
-      int? sellGarbageAmount = int.parse(stdin.readLineSync()!);
-
-      double profit = sellingUnitPrice * sellGarbageAmount;
-
-      if(sellGarbageAmount > player.getGarbageCart) {
-        draw.notEnoughGarbage(sellGarbageAmount, player.garbageCart);
-        player.setWallet = player.getWallet - transactionFee;
-      } else if (sellGarbageAmount > 0 && sellGarbageAmount <= player.garbageCart) {
-        player.setWallet = player.getWallet + profit - transactionFee;
-      }
-
-    }else if (playersGarbage == 0 && playersWallet <= 1.4) {
-      print('YOU LOST');
-    }else {
-      draw.chooseBuyOrSell();
-      String? action = stdin.readLineSync();
     }
+  }
 
+  void buyGarbage(marek.Marek player, vendor.Vendor shop, ui.Ui draw) {
+    draw.chooseBuyAmount();
 
+    int? buyGarbageAmount = int.parse(stdin.readLineSync()!);
+
+    double playersWallet = player.getWallet;
+
+    double unitPrice = shop.generateGarbageUnitPrice();
+    shop.setGarbageUnitPrice = unitPrice;
+
+    double totalPrice = formatMoney((buyGarbageAmount * unitPrice) + transactionFee);
+
+    if (buyGarbageAmount <= 0) {
+      draw.invalidGarbageAmount();
+      player.setWallet = formatMoney(playersWallet - transactionFee);
+    } else if (totalPrice > playersWallet) {
+      draw.notEnoughMoney(totalPrice, playersWallet);
+      player.setWallet = formatMoney(playersWallet - transactionFee);
+    } else if (totalPrice <= playersWallet){
+      draw.boughtGarbage(buyGarbageAmount, unitPrice);
+      player.setWallet = formatMoney(playersWallet - totalPrice);
+      player.setGarbageCart = player.getGarbageCart + buyGarbageAmount;
+    }
+  }
+
+  void sellGarbage(marek.Marek player, ui.Ui draw) {
+    draw.chooseSellAmount();
+
+    int? sellGarbageAmount = int.parse(stdin.readLineSync()!);
+    double playersWallet = player.getWallet;
+
+    double profit = sellingUnitPrice * sellGarbageAmount;
+
+    if(sellGarbageAmount <= 0) {
+      draw.invalidGarbageAmount();
+      player.setWallet = formatMoney(playersWallet - transactionFee);
+    }
+    if(sellGarbageAmount > player.getGarbageCart) {
+      draw.notEnoughGarbage(sellGarbageAmount, player.garbageCart);
+      player.setWallet = formatMoney(playersWallet - transactionFee);
+    } else if (sellGarbageAmount > 0 && sellGarbageAmount <= player.garbageCart) {
+      draw.soldGarbage(sellGarbageAmount, profit - transactionFee);
+      player.setWallet = formatMoney(playersWallet + profit - transactionFee);
+      player.setGarbageCart = player.getGarbageCart - sellGarbageAmount;
+    } else if (sellGarbageAmount < 0) {
+    }
+  }
+
+  double formatMoney(double amount) {
+    return double.parse(amount.toStringAsFixed(1));
   }
 
 }
+
