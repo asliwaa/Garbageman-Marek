@@ -4,17 +4,22 @@ import 'package:garbageman_marek/ui.dart' as ui;
 
 import 'dart:io';
 
+//Class that controlls the game logic
 class Game {
 
+  //Transaction fee applied for every transaction (succesfull and unsuccesfull)
   static const double transactionFee = 0.1;
+  //Players garbage selling price
   static const double sellingUnitPrice = 2.0;
 
+  //Runs the game main logic
   void runGame() {
 
     var player = marek.Marek();
     var draw = ui.Ui();
     var shop = vendor.Vendor();
 
+    //Flag for game status control
     bool gameOn = true;
 
     while (gameOn) {
@@ -66,6 +71,7 @@ class Game {
     }
   }
 
+  //Handles logic for buying garbage
   void buyGarbage(marek.Marek player, vendor.Vendor shop, ui.Ui draw) {
     draw.chooseBuyAmount();
 
@@ -91,6 +97,7 @@ class Game {
     }
   }
 
+  //Handles logic for selling garbage
   void sellGarbage(marek.Marek player, ui.Ui draw) {
     draw.chooseSellAmount();
 
@@ -114,6 +121,7 @@ class Game {
     }
   }
 
+  //Formats decimal numbers to one decimal place
   double formatMoney(double amount) {
     return double.parse(amount.toStringAsFixed(1));
   }

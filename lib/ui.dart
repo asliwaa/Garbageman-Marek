@@ -1,9 +1,12 @@
 import 'dart:io';
 
+//Class that represents the UI
 class Ui {
 
+  //Stores messages
   String _message = ''; 
 
+  //Prints the stored message
   void showMessage() {
     if (_message.isNotEmpty) {
       print('\n*** $_message ***\n');
@@ -59,6 +62,7 @@ class Ui {
     stdout.write('Choose action [ (B)uy | (S)ell ]: ');
   }
 
+  //Clears screen
   void clearScreen() {
     print('\x1B[2J\x1B[0;0H');
   }

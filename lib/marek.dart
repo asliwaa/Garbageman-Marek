@@ -1,5 +1,7 @@
+//Class representing the player
 class Marek {
 
+  //Starting cash and garbage amount
   double wallet = 10.0;
   int garbageCart = 0;
 
