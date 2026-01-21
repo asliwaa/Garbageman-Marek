@@ -1,5 +1,5 @@
 import 'package:garbageman_marek/vendor.dart' as vendor;
-import 'package:garbageman_marek/marek.dart' as marek;
+import 'package:garbageman_marek/mietek.dart' as mietek;
 import 'package:garbageman_marek/ui.dart' as ui;
 
 import 'dart:io';
@@ -8,15 +8,18 @@ import 'dart:io';
 class Game {
 
   //Transaction fee applied for every transaction (succesfull and unsuccesfull)
-  static const double transactionFee = 0.1;
+  static const double transactionFee = 0.10;
   //Players garbage selling price
-  static const double sellingUnitPrice = 2.0;
+  static const double sellingUnitPrice = 2.00;
+
+  final ui.GameInterface view;
+
+  Game(this.view);
 
   //Runs the game main logic
   void runGame() {
 
-    var player = marek.Marek();
-    var draw = ui.Ui();
+    var player = mietek.Mietek();
     var shop = vendor.Vendor();
 
     //Flag for game status control
@@ -24,47 +27,36 @@ class Game {
 
     while (gameOn) {
 
-      draw.clearScreen();
+      view.clearScreen();
 
-      draw.logo();
-      draw.walletAndGarbageCart(player.getWallet, player.getGarbageCart);
+      view.showLogo();
+      view.showWalletAndGarbage(player.getWallet, player.getGarbageCart);
 
-      draw.showMessage();
+      view.showMessage();
 
       int playersGarbage = player.getGarbageCart;
       double playersWallet = player.getWallet;
 
       if (playersWallet >= 50.0) {
 
-        print ('YOU WON');
+        view.showWin();
         gameOn = false;
         
-      } else if (playersWallet == 1.4 && playersGarbage == 0){
+      } else if (playersWallet < 1.5 && playersGarbage == 0){
         
-        print('YOU LOST');
+        view.showLoss();
         gameOn = false;
 
-      } else if (playersGarbage == 0) {
+      } else {
 
-        draw.mustBuy();
-        buyGarbage(player, shop, draw);
-
-      } else if (playersGarbage > 0 && playersWallet <= 1.4) {
-
-        draw.mustSell();
-        sellGarbage(player, draw);
-
-      }else if (playersGarbage >= 1 && playersWallet >= 1.5) {
-
-        draw.chooseBuyOrSell();
-        String? action = stdin.readLineSync();
-
-        if (action == 'B') {
-          buyGarbage(player, shop, draw);
-        } else if (action == 'S') {
-          sellGarbage(player, draw);
+        ui.PlayerAction action = view.chooseBuyOrSell();
+        
+        if (action == ui.PlayerAction.buy) {
+          buyGarbage(player, shop);
+        } else if (action == ui.PlayerAction.sell) {
+          sellGarbage(player);
         } else {
-          break;
+          gameOn = false;
         }
 
       }
@@ -72,58 +64,51 @@ class Game {
   }
 
   //Handles logic for buying garbage
-  void buyGarbage(marek.Marek player, vendor.Vendor shop, ui.Ui draw) {
-    draw.chooseBuyAmount();
-
-    int? buyGarbageAmount = int.parse(stdin.readLineSync()!);
+  void buyGarbage(mietek.Mietek player, vendor.Vendor shop) {
+    int buyGarbageAmount = view.chooseBuyAmount();
 
     double playersWallet = player.getWallet;
-
     double unitPrice = shop.generateGarbageUnitPrice();
     shop.setGarbageUnitPrice = unitPrice;
 
-    double totalPrice = formatMoney((buyGarbageAmount * unitPrice) + transactionFee);
+    double totalPrice = formatMoney(buyGarbageAmount * unitPrice);
 
     if (buyGarbageAmount <= 0) {
-      draw.invalidGarbageAmount();
+      view.showInvalidGarbageAmount();
       player.setWallet = formatMoney(playersWallet - transactionFee);
     } else if (totalPrice > playersWallet) {
-      draw.notEnoughMoney(totalPrice, playersWallet);
+      view.showNotEnoughMoney(totalPrice, playersWallet);
       player.setWallet = formatMoney(playersWallet - transactionFee);
     } else if (totalPrice <= playersWallet){
-      draw.boughtGarbage(buyGarbageAmount, unitPrice);
-      player.setWallet = formatMoney(playersWallet - totalPrice);
+      view.showBoughtGarbage(buyGarbageAmount, unitPrice);
+      player.setWallet = formatMoney(playersWallet - totalPrice - transactionFee);
       player.setGarbageCart = player.getGarbageCart + buyGarbageAmount;
     }
   }
 
   //Handles logic for selling garbage
-  void sellGarbage(marek.Marek player, ui.Ui draw) {
-    draw.chooseSellAmount();
+  void sellGarbage(mietek.Mietek player) {
+    int sellGarbageAmount = view.chooseSellAmount();
 
-    int? sellGarbageAmount = int.parse(stdin.readLineSync()!);
     double playersWallet = player.getWallet;
-
     double profit = sellingUnitPrice * sellGarbageAmount;
 
     if(sellGarbageAmount <= 0) {
-      draw.invalidGarbageAmount();
+      view.showInvalidGarbageAmount();
       player.setWallet = formatMoney(playersWallet - transactionFee);
-    }
-    if(sellGarbageAmount > player.getGarbageCart) {
-      draw.notEnoughGarbage(sellGarbageAmount, player.garbageCart);
+    } else if(sellGarbageAmount > player.getGarbageCart) {
+      view.showNotEnoughGarbage(sellGarbageAmount, player.garbageCart);
       player.setWallet = formatMoney(playersWallet - transactionFee);
     } else if (sellGarbageAmount > 0 && sellGarbageAmount <= player.garbageCart) {
-      draw.soldGarbage(sellGarbageAmount, profit - transactionFee);
+      view.showSoldGarbage(sellGarbageAmount, profit - transactionFee);
       player.setWallet = formatMoney(playersWallet + profit - transactionFee);
       player.setGarbageCart = player.getGarbageCart - sellGarbageAmount;
-    } else if (sellGarbageAmount < 0) {
     }
   }
 
-  //Formats decimal numbers to one decimal place
+  //Formats decimal numbers to two decimal places
   double formatMoney(double amount) {
-    return double.parse(amount.toStringAsFixed(1));
+    return double.parse(amount.toStringAsFixed(2));
   }
 
 }

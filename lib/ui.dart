@@ -1,68 +1,121 @@
 import 'dart:io';
 
+enum PlayerAction {
+  buy,
+  sell,
+  error
+}
+
+abstract class GameInterface {
+  String? message;
+  void showMessage();
+  void showLogo();
+  void showWalletAndGarbage(double wallet, int garbageCart);
+
+  PlayerAction chooseBuyOrSell();
+
+  int chooseBuyAmount();
+  int chooseSellAmount();
+  
+  void showNotEnoughMoney(double totalPrice, double wallet);
+  void showBoughtGarbage(int amount, double unitPrice);
+  void showNotEnoughGarbage(int amount, int currentCart);
+  void showSoldGarbage(int amount, double profit);
+  void showInvalidGarbageAmount();
+
+  void showWin();
+  void showLoss();
+  void clearScreen();
+}
+
 //Class that represents the UI
-class Ui {
+class ConsoleUi implements GameInterface {
 
-  //Stores messages
-  String _message = ''; 
+  @override
+  String? message = '';
 
-  //Prints the stored message
+  @override
   void showMessage() {
-    if (_message.isNotEmpty) {
-      print('\n*** $_message ***\n');
-      _message = '';
+    if(message != '') {
+      print('\n*** $message ***\n');
+      message = '';
     }
   }
 
-  void logo() {
-    print('   GARBAGE MAN - MAREK');
+  @override
+  void showLogo() {
+    print('   GARBAGE MAN - MIETEK');
   }
 
-  void walletAndGarbageCart(var wallet, var garbageCart) {
+  @override
+  void showWalletAndGarbage(double wallet, int garbageCart) {
     print('Wallet: $wallet\$  Garbage Cart: $garbageCart');
   }
 
-  void mustBuy() {
-    _message = 'No garbage to sell. You must buy some.';
+  @override
+  PlayerAction chooseBuyOrSell() {
+    stdout.write('Choose action [ (B)uy | (S)ell ]: ');
+    String? action = stdin.readLineSync();
+
+    if (action?.toUpperCase() == 'B') {
+      return PlayerAction.buy;
+    } else if (action?.toUpperCase() == 'S') {
+      return PlayerAction.sell;
+    } else {
+      return PlayerAction.error;
+    }
+  }
+
+  @override
+  int chooseBuyAmount() {
+    stdout.write('Buy garbage (amount): ');
+    int? buyGarbageAmount = int.parse(stdin.readLineSync()!);
+    return buyGarbageAmount;
+  }
+
+  @override
+  int chooseSellAmount() {
+    stdout.write('Sell garbage (amount): ');
+    int? sellGarbageAmount = int.parse(stdin.readLineSync()!);
+    return sellGarbageAmount;
+  }
+
+  @override
+  void showNotEnoughMoney(double totalPrice, double wallet) {
+    message = ('Total price was $totalPrice\$, you have $wallet\$.\$.');
+  }
+
+  @override
+  void showBoughtGarbage(int amount, double unitPrice) {
+    message = ('You bought $amount garbage pieces for $unitPrice\$ each.\$.');
   }
   
-  void notEnoughMoney(double totalPrice, double wallet) {
-    _message = 'Total price was $totalPrice\$, you only have $wallet\$.';
+  @override
+  void showNotEnoughGarbage(int amount, int currentCart) {
+    message = ('You wanted to sell $amount pieces of garbage, but have $currentCart in your cart.\$.');
   }
 
-  void boughtGarbage(int buyGarbageAmount, double unitPrice) {
-    _message = 'You bought $buyGarbageAmount garbage pieces for $unitPrice\$ each.';
+  @override
+  void showSoldGarbage(int amount, double profit) {
+    message = ('You sold $amount pieces of garbage and earned $profit\$.');
   }
 
-  void mustSell() {
-    _message = 'Not enough money in wallet to buy anything. You must sell something.';
+  @override
+  void showInvalidGarbageAmount() {
+    message = ('Invalid garbage amount.');
   }
 
-  void notEnoughGarbage(int sellGarbageAmount, int garbageCart) {
-    _message = 'You wanted to sell $sellGarbageAmount pieces of garbage, but have only $garbageCart in your cart.';
+  @override
+  void showWin() {
+    print('YOU WON');
   }
 
-  void soldGarbage(int sellGarbageAmount, double profit) {
-    _message = 'You sold $sellGarbageAmount pieces of garbage and earned $profit';
+  @override
+  void showLoss() {
+    print('YOU LOST');
   }
 
-  void invalidGarbageAmount() {
-    _message = 'Invalid garbage amount.';
-  }
-
-  void chooseBuyAmount() {
-    stdout.write('Buy garbage (amount): ');
-  }
-
-  void chooseSellAmount() {
-    stdout.write('Sell garbage (amount): ');
-  }
-
-  void chooseBuyOrSell() {
-    stdout.write('Choose action [ (B)uy | (S)ell ]: ');
-  }
-
-  //Clears screen
+  @override
   void clearScreen() {
     print('\x1B[2J\x1B[0;0H');
   }

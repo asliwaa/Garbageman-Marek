@@ -1,8 +1,8 @@
 //Class representing the player
-class Marek {
+class Mietek {
 
   //Starting cash and garbage amount
-  double wallet = 10.0;
+  double wallet = 10.00;
   int garbageCart = 0;
 
   //Getter and setter for wallet

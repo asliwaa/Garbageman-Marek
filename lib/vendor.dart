@@ -13,8 +13,8 @@ class Vendor {
 
   //Generates a random number decimal from 1.5 to 2.5
   double generateGarbageUnitPrice () {
-    var randomPrice = Random().nextDouble() * (2.5 - 1.5) + 1.5;
-    return double.parse(randomPrice.toStringAsFixed(1));
+    var randomPrice = Random().nextDouble() + 1.50;
+    return double.parse(randomPrice.toStringAsFixed(2));
   }
 
 }
