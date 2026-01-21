@@ -2,8 +2,6 @@ import 'package:garbageman_marek/vendor.dart' as vendor;
 import 'package:garbageman_marek/mietek.dart' as mietek;
 import 'package:garbageman_marek/ui.dart' as ui;
 
-import 'dart:io';
-
 //Class that controlls the game logic
 class Game {
 
